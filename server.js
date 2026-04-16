@@ -9,6 +9,7 @@ const connectDB = require("./config/db");
 
 const userAuthRoutes = require("./routes/userAuthRoutes");
 const shopRoutes = require("./routes/ShopRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 
 dotenv.config();
@@ -61,11 +62,10 @@ io.on("connection", (socket) => {
 
 app.use("/api/users", userAuthRoutes);
 app.use("/api/shops", shopRoutes);
-
-
+app.use("/api/orders", orderRoutes);
 
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
   console.log(` Server running on port ${PORT}`);
-});
+});  

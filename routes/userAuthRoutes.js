@@ -40,7 +40,6 @@ router.post("/register", async (req, res) => {
 
     
     const hashedPassword = await bcrypt.hash(password, 10);
-
     
     await User.create({
       name,
@@ -55,11 +54,10 @@ router.post("/register", async (req, res) => {
     console.error("REGISTER ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
-});
-
-
-
-
+}); 
+ 
+ 
+ 
 router.post("/login", loginLimiter, async (req, res) => {
   try {
     const { phone, password } = req.body;
@@ -68,8 +66,7 @@ router.post("/login", loginLimiter, async (req, res) => {
     const user = await User.findOne({ phone });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
-    }
-
+    } 
     
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {

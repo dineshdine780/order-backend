@@ -49,4 +49,15 @@ router.post("/", upload.single("photo"), async (req, res) => {
   }
 });
 
+
+
+router.get("/", async (req, res) => {
+  try {
+    const shops = await Shop.find().sort({ createdAt: -1 });
+    res.json(shops);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
