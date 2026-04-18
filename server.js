@@ -10,6 +10,7 @@ const connectDB = require("./config/db");
 const userAuthRoutes = require("./routes/userAuthRoutes");
 const shopRoutes = require("./routes/ShopRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 
 dotenv.config();
@@ -63,6 +64,7 @@ io.on("connection", (socket) => {
 app.use("/api/users", userAuthRoutes);
 app.use("/api/shops", shopRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/admin", adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 

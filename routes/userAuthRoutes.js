@@ -7,18 +7,15 @@ const rateLimit = require("express-rate-limit");
 
 const router = express.Router();
 
-
 const loginLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 5,
   message: { message: "Too many login attempts. Try again after 1 minute." }
-});
+}); 
 
-
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res) => { 
   try {
-    let { name, email, phone, password } = req.body;
-
+    let { name, email, phone, password, role  } = req.body;
    
     if (!name || !email || !phone || !password) {
       return res.status(400).json({ message: "All fields are required" });
@@ -26,18 +23,15 @@ router.post("/register", async (req, res) => {
 
     name = name.trim();
     phone = phone.replace(/\s+/g, "");
-
    
     if (!/^[0-9]{10}$/.test(phone)) {
       return res.status(400).json({ message: "Invalid phone number" });
     }
-
-   
+     
     const exist = await User.findOne({ phone });
     if (exist) {
       return res.status(400).json({ message: "User already exists" });
     }
-
     
     const hashedPassword = await bcrypt.hash(password, 10);
     
@@ -45,7 +39,8 @@ router.post("/register", async (req, res) => {
       name,
       email,
       phone,
-      password: hashedPassword
+      password: hashedPassword,
+      role: role || "user",
     });
 
     res.status(201).json({ message: "User registered successfully" });
@@ -54,16 +49,15 @@ router.post("/register", async (req, res) => {
     console.error("REGISTER ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
-}); 
- 
+});  
  
  
 router.post("/login", loginLimiter, async (req, res) => {
   try {
     const { phone, password } = req.body;
-
     
     const user = await User.findOne({ phone });
+
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
     } 
@@ -77,7 +71,7 @@ router.post("/login", loginLimiter, async (req, res) => {
       { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
-    );
+    ); 
 
     res.json({
       token,
@@ -86,22 +80,21 @@ router.post("/login", loginLimiter, async (req, res) => {
         name: user.name,
         phone: user.phone
       }
-    });
+    }); 
 
   } catch (err) {
     console.error("LOGIN ERROR:", err);
     res.status(500).json({ message: "Server error" });
   }
-});
+}); 
 
 
-router.get("/status-check", protectUser, async (req, res) => {
+router.get("/status-check", protectUser, async (req, res) => { 
   try {
     res.json({ status: "User authenticated" });
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
 });
-
 
 module.exports = router;
