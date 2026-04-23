@@ -11,6 +11,8 @@ const userAuthRoutes = require("./routes/userAuthRoutes");
 const shopRoutes = require("./routes/ShopRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const itemRoutes = require("./routes/itemRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 
 dotenv.config();
@@ -65,6 +67,8 @@ app.use("/api/users", userAuthRoutes);
 app.use("/api/shops", shopRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/items", itemRoutes);
+app.use("/api/payments", paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
