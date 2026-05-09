@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const paymentSchema = new mongoose.Schema(
+
   {
     shopId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -34,6 +35,7 @@ const paymentSchema = new mongoose.Schema(
       default: "Pending",
     },
   },
+  
   { timestamps: true }
 );
 

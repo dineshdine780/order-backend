@@ -29,6 +29,10 @@ const itemSchema = new mongoose.Schema(
     default: 0 
 },
 
+ image: {
+    type: String
+  }
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("Item", itemSchema);

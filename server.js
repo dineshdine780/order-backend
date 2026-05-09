@@ -4,6 +4,9 @@ const cors = require("cors");
 const helmet = require("helmet");
 const http = require("http");
 const { Server } = require("socket.io");
+const path = require("path");
+
+
 
 const connectDB = require("./config/db");
 
@@ -22,6 +25,8 @@ connectDB();
 
 const app = express();
 const server = http.createServer(app);
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
 app.use(
@@ -61,6 +66,7 @@ io.on("connection", (socket) => {
     console.log("Socket error:", err.message);
   });
 });
+
 
 
 app.use("/api/users", userAuthRoutes);

@@ -4,11 +4,29 @@ const Item = require("../models/Item");
 
 
 
+
+
+// ADD ITEM
 router.post("/", async (req, res) => {
   try {
-    const item = new Item(req.body);
+
+    const item = new Item({
+      name: req.body.name,
+      category: req.body.category,
+      sellingPrice: req.body.sellingPrice,
+      sellingUnit: req.body.sellingUnit,
+      minQuantity: req.body.minQuantity,
+      minOrderQuantity: req.body.minOrderQuantity,
+      image: req.body.image,
+    });
+
     await item.save();
-    res.json({ message: "Item added", item });
+
+    res.json({
+      message: "Item added",
+      item,
+    });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -16,6 +34,7 @@ router.post("/", async (req, res) => {
 
 
 
+// GET ITEMS
 router.get("/", async (req, res) => {
   try {
     const items = await Item.find().sort({ createdAt: -1 });
@@ -27,6 +46,7 @@ router.get("/", async (req, res) => {
 
 
 
+// UPDATE ITEM
 router.put("/:id", async (req, res) => {
   try {
     const updated = await Item.findByIdAndUpdate(
@@ -34,7 +54,9 @@ router.put("/:id", async (req, res) => {
       req.body,
       { new: true }
     );
+
     res.json(updated);
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -42,10 +64,15 @@ router.put("/:id", async (req, res) => {
 
 
 
+// DELETE ITEM
 router.delete("/:id", async (req, res) => {
   try {
     await Item.findByIdAndDelete(req.params.id);
-    res.json({ message: "Item deleted" });
+
+    res.json({
+      message: "Item deleted"
+    });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
