@@ -5,11 +5,23 @@ const Shop = require("../models/Shop");
 
 
 const storage = multer.diskStorage({
+
   destination: (req, file, cb) => {
     cb(null, "uploads/");
   },
+
   filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+
+    const cleanName =
+      file.originalname
+        .replace(/\s+/g, "-")
+        .replace(/#/g, "")
+        .replace(/[^a-zA-Z0-9.-]/g, "");
+
+    cb(
+      null,
+      Date.now() + "-" + cleanName
+    );
   },
 });
 
@@ -31,7 +43,9 @@ router.post("/", upload.single("photo"), async (req, res) => {
   shopName,
   ownerName,
   phone,
-  photo: req.file ? req.file.path : "",
+  photo: req.file
+          ? `/uploads/${req.file.filename}`
+          : "",
   location: {
     latitude,
     longitude,
