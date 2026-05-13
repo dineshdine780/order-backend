@@ -16,6 +16,7 @@ const orderRoutes = require("./routes/orderRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const itemRoutes = require("./routes/itemRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
+const purchaseRoutes = require("./routes/purchaseRoutes");
 
 
 dotenv.config();
@@ -75,6 +76,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/purchases", purchaseRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -15,9 +15,20 @@ const orderSchema = new mongoose.Schema(
         name: String,
         qty: Number,
         price: Number,
+
+        delivered: {
+      type: Boolean,
+      default: false,
+    },
       },
     ],
     totalAmount: Number,
+
+    orderStatus: {
+      type: String,
+      enum: ["Pending", "Delivered"],
+      default: "Pending",
+    },
     
     paymentMethod: {
       type: String,

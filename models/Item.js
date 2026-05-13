@@ -24,9 +24,9 @@ const itemSchema = new mongoose.Schema(
     type: Number, 
     default: 0 
 },
-  minOrderQuantity: { 
-    type: Number, 
-    default: 0 
+ actualQuantity: {
+  type: Number,
+  default: 0,
 },
 
  image: {

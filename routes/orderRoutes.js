@@ -17,7 +17,6 @@ router.post("/", async (req, res) => {
     for (let i of items) {
       const item = await Item.findOne({
   name: i.name,
-  shopId,
 });
 
       if (!item || item.actualQuantity < i.qty) {
@@ -33,14 +32,19 @@ router.post("/", async (req, res) => {
 
    const finalPaidAmount = Number(paidAmount || 0);
 
-const balanceAmount = finalTotalAmount - finalPaidAmount;
+   const balanceAmount = finalTotalAmount - finalPaidAmount;
 
    
 
-    const order = new Order({
+    const updatedItems = items.map(item => ({
+  ...item,
+  delivered: false,
+}));
+
+const order = new Order({
   orderId,
   shopId,
-  items,
+  items: updatedItems,
   totalAmount: finalTotalAmount,
   discount: Number(discount || 0),
   paymentMethod,
@@ -50,16 +54,6 @@ const balanceAmount = finalTotalAmount - finalPaidAmount;
 });
 
     await order.save();
-
-    await Payment.create({
-      shopId,
-      order: order._id,
-      orderId,
-      totalAmount: finalTotalAmount,
-      paidAmount: finalPaidAmount,
-      balance: balanceAmount,
-      status: balanceAmount > 0 ? "Pending" : "Completed",
-    });
 
     
     await Promise.all(
@@ -206,18 +200,198 @@ router.put(
 
 
 
+router.put("/delivered/:id", async (req, res) => {
+
+  try {
+
+    if (!req.params.id) {
+      return res.status(400).json({
+        message: "Order ID missing"
+      });
+    }
+
+    const order =
+      await Order.findByIdAndUpdate(
+        req.params.id,
+        {
+          orderStatus: "Delivered",
+        },
+        { new: true }
+      );
+
+    if (!order) {
+      return res.status(404).json({
+        message: "Order not found",
+      });
+    }
+
+    res.json(order);
+
+  } catch (err) {
+
+    res.status(500).json({
+      message: err.message,
+    });
+
+  }
+});
+
+
+
 router.put(
-  "/delivered/:id",
+  "/deliver-items/:id",
   async (req, res) => {
 
     try {
+
+      const { itemIndexes } = req.body;
+
+      const order =
+        await Order.findById(req.params.id);
+
+      if (!order) {
+        return res.status(404).json({
+          message: "Order not found",
+        });
+      }
+
+      itemIndexes.forEach(index => {
+
+        if (order.items[index]) {
+          order.items[index].delivered = true;
+        }
+
+      });
+
+      // CHECK ALL ITEMS DELIVERED
+
+      const allDelivered =
+        order.items.every(
+          item => item.delivered
+        );
+
+      if (allDelivered) {
+        order.orderStatus = "Delivered";
+      }
+
+      await order.save();
+
+      res.json(order);
+
+    } catch (err) {
+
+      res.status(500).json({
+        message: err.message,
+      });
+
+    }
+  }
+);
+
+
+
+router.put(
+  "/deliver-selected",
+  async (req, res) => {
+
+    try {
+
+      const { items } = req.body;
+
+      for (let selected of items) {
+
+        const order =
+          await Order.findById(
+            selected.orderId
+          );
+
+        if (!order) continue;
+
+        
+
+        if (
+  order.items[selected.itemIndex]
+) {
+
+  order.items[
+    selected.itemIndex
+  ].delivered = true;
+
+  const deliveredItem =
+    order.items[selected.itemIndex];
+
+  await Item.findOneAndUpdate(
+    {
+      name: deliveredItem.name,
+    },
+    {
+      $inc: {
+        actualQuantity:
+          -deliveredItem.qty,
+      },
+    }
+  );
+
+}
+
+        
+
+        const allDelivered =
+          order.items.every(
+            item => item.delivered === true
+          );
+
+        
+
+        if (allDelivered) {
+
+          order.orderStatus =
+            "Delivered";
+
+        } else {
+
+          order.orderStatus =
+            "Pending";
+
+        }
+
+        await order.save();
+      }
+
+      res.json({
+        message:
+          "Selected items delivered",
+      });
+
+    } catch (err) {
+
+      res.status(500).json({
+        message: err.message,
+      });
+
+    }
+  }
+);
+
+
+
+router.put(
+  "/payment/:id",
+  async (req, res) => {
+
+    try {
+
+      const {
+        paidAmount,
+        balanceAmount,
+      } = req.body;
 
       const order =
         await Order.findByIdAndUpdate(
           req.params.id,
           {
-            orderStatus:
-              "Delivered",
+            paidAmount,
+            balanceAmount,
           },
           { new: true }
         );
@@ -229,11 +403,10 @@ router.put(
       res.status(500).json({
         message: err.message,
       });
+
     }
   }
 );
-
-
 
 
 

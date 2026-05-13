@@ -16,7 +16,7 @@ router.post("/", async (req, res) => {
       sellingPrice: req.body.sellingPrice,
       sellingUnit: req.body.sellingUnit,
       minQuantity: req.body.minQuantity,
-      minOrderQuantity: req.body.minOrderQuantity,
+      actualQuantity: req.body.actualQuantity,
       image: req.body.image,
     });
 
@@ -77,5 +77,10 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
+
+
 
 module.exports = router;
