@@ -5,7 +5,12 @@ const Payment = require("../models/Payment");
 
 router.post("/", async (req, res) => {
   try {
-    const { shopId, orderId, totalAmount, paidAmount } = req.body;
+   const {
+  shopId,
+  orderId,
+  totalAmount,
+  paidAmount,
+} = req.body;
 
     const balance = totalAmount - paidAmount;
 
@@ -39,5 +44,58 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
+
+router.put(
+  "/update/:orderId",
+  async (req, res) => {
+
+    try {
+
+      const {
+        paidAmount,
+      } = req.body;
+
+      const payment =
+        await Payment.findOne({
+          orderId:
+            req.params.orderId,
+        });
+
+      if (!payment) {
+
+        return res.status(404).json({
+          message:
+            "Payment not found",
+        });
+
+      }
+
+      payment.paidAmount =
+        Number(paidAmount);
+
+      payment.balance =
+        payment.totalAmount -
+        Number(paidAmount);
+
+      payment.status =
+        payment.balance > 0
+          ? "Pending"
+          : "Completed";
+
+      await payment.save();
+
+      res.json(payment);
+
+    } catch (err) {
+
+      res.status(500).json({
+        error: err.message,
+      });
+
+    }
+  }
+);
 
 module.exports = router;

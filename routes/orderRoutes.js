@@ -26,9 +26,9 @@ router.post("/", async (req, res) => {
       }
     }
 
-    const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
+   const orderId = "ORD-" + Math.floor(100000 + Math.random() * 900000);
 
-    const finalTotalAmount = Number(totalAmount || 0);
+   const finalTotalAmount = Number(totalAmount || 0);
 
    const finalPaidAmount = Number(paidAmount || 0);
 
@@ -51,7 +51,7 @@ const order = new Order({
   paidAmount: finalPaidAmount,
   balanceAmount,
   orderStatus: "Pending",
-});
+}); 
 
     await order.save();
 
@@ -60,9 +60,9 @@ const order = new Order({
       items.map(i =>
         Item.findOneAndUpdate(
           {
-  name: i.name,
-  shopId,
-},
+            name: i.name,
+            shopId,
+          },
           { $inc: { actualQuantity: -i.qty } }
         )
       )
@@ -432,6 +432,182 @@ router.delete("/:id", async (req, res) => {
 
 
 
+router.put(
+  "/cancel/:id",
+  async (req, res) => {
+
+    try {
+
+      const order =
+        await Order.findByIdAndUpdate(
+          req.params.id,
+          {
+            orderStatus: "Cancelled",
+          },
+          { new: true }
+        );
+
+      if (!order) {
+        return res.status(404).json({
+          message: "Order not found",
+        });
+      }
+
+      res.json(order);
+
+    } catch (err) {
+
+      res.status(500).json({
+        message: err.message,
+      });
+
+    }
+  }
+);   
+
+
+
+router.delete(
+  "/delete-item/:id/:index",
+  async (req, res) => {
+
+    try {
+
+      const order =
+        await Order.findById(
+          req.params.id
+        );
+
+      if (!order) {
+        return res.status(404).json({
+          message: "Order not found",
+        });
+      }
+
+      const itemIndex =
+        Number(req.params.index);
+
+      order.items.splice(itemIndex, 1);
+
+      // RECALCULATE TOTAL
+
+      order.totalAmount =
+        order.items.reduce(
+          (sum, item) =>
+            sum +
+            item.qty * item.price,
+          0
+        );
+
+      // IF NO ITEMS
+
+      if (order.items.length === 0) {
+
+        order.orderStatus =
+          "Cancelled";
+
+      }
+
+      await order.save();
+
+      res.json(order);
+
+    } catch (err) {
+
+      res.status(500).json({
+        message: err.message,
+      });
+
+    }
+  }
+);
+
+
+
+router.put(
+  "/complete/:id",
+  async (req, res) => {
+
+    try {
+
+      const order =
+        await Order.findByIdAndUpdate(
+          req.params.id,
+          {
+            orderStatus: "Completed",
+          },
+          { new: true }
+        );
+
+      if (!order) {
+
+        return res.status(404).json({
+          message: "Order not found",
+        });
+
+      }
+
+      res.json(order);
+
+    } catch (err) {
+
+      res.status(500).json({
+        message: err.message,
+      });
+
+    }
+  }
+);
+
+
+
+router.put(
+  "/update-order/:id",
+  async (req, res) => {
+
+    try {
+
+      const { items } = req.body;
+
+      const order =
+        await Order.findById(
+          req.params.id
+        );
+
+      if (!order) {
+
+        return res.status(404).json({
+          message: "Order not found",
+        });
+
+      }
+
+      order.items = items;
+
+      order.totalAmount =
+        items.reduce(
+          (sum, item) =>
+            sum +
+            item.qty * item.price,
+          0
+        );
+
+      await order.save();
+
+      res.json(order);
+
+    } catch (err) {
+
+      res.status(500).json({
+        message: err.message,
+      });
+
+    }
+  }
+);
+
+
+
 router.get("/:shopId", async (req, res) => {
   try {
     const orders = await Order.find({
@@ -457,9 +633,7 @@ router.get("/", async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-}); 
-
-
+});
 
 
 module.exports = router;
