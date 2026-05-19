@@ -48,26 +48,22 @@ router.get("/", async (req, res) => {
 
 
 router.put(
-  "/update/:orderId",
+  "/update/:id",
   async (req, res) => {
 
     try {
 
-      const {
-        paidAmount,
-      } = req.body;
+      const { paidAmount } = req.body;
 
       const payment =
         await Payment.findOne({
-          orderId:
-            req.params.orderId,
+          orderId: req.params.id,
         });
 
       if (!payment) {
 
         return res.status(404).json({
-          message:
-            "Payment not found",
+          message: "Payment not found",
         });
 
       }
@@ -97,5 +93,10 @@ router.put(
     }
   }
 );
+
+
+
+
+
 
 module.exports = router;

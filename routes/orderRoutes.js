@@ -409,6 +409,49 @@ router.put(
 );
 
 
+router.put(
+  "/update-payment/:orderId",
+  async (req, res) => {
+
+    try {
+
+      const { orderId } = req.params;
+
+      const {
+        paidAmount,
+        balanceAmount,
+      } = req.body;
+
+      const updatedOrder =
+        await Order.findOneAndUpdate(
+          { orderId },
+          {
+            paidAmount,
+            balanceAmount,
+          },
+          { new: true }
+        );
+
+      if (!updatedOrder) {
+        return res.status(404).json({
+          message: "Order not found",
+        });
+      }
+
+      res.json(updatedOrder);
+
+    } catch (err) {
+
+      res.status(500).json({
+        message: err.message,
+      });
+
+    }
+
+  }
+);
+
+
 
 router.delete("/:id", async (req, res) => {
 
@@ -438,14 +481,8 @@ router.put(
 
     try {
 
-      const order =
-        await Order.findByIdAndUpdate(
-          req.params.id,
-          {
-            orderStatus: "Cancelled",
-          },
-          { new: true }
-        );
+      // FIND ORDER
+      const order = await Order.findById(req.params.id);
 
       if (!order) {
         return res.status(404).json({
@@ -453,9 +490,26 @@ router.put(
         });
       }
 
+    
+      order.orderStatus = "Cancelled";
+
+      await order.save();
+
+     
+      await Payment.findOneAndUpdate(
+        {
+          orderId: order.orderId,
+        },
+        {
+          status: "Cancelled",
+        }
+      );
+
       res.json(order);
 
     } catch (err) {
+
+      console.log(err);
 
       res.status(500).json({
         message: err.message,
@@ -463,7 +517,7 @@ router.put(
 
     }
   }
-);   
+);
 
 
 

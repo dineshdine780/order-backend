@@ -22,13 +22,25 @@ const orderSchema = new mongoose.Schema(
     },
       },
     ],
-    totalAmount: Number,
+    subtotal: Number,
+
+discount: {
+  type: Number,
+  default: 0,
+},
+
+totalAmount: Number,
 
     orderStatus: {
-      type: String,
-      enum: ["Pending", "Delivered"],
-      default: "Pending",
-    },
+  type: String,
+  enum: [
+    "Pending",
+    "Delivered",
+    "Completed",
+    "Cancelled",
+  ],
+  default: "Pending",
+},
     
     paymentMethod: {
       type: String,
