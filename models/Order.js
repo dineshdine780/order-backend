@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
   {
+    
     orderId: {
       type: String,
     },
@@ -10,6 +11,9 @@ const orderSchema = new mongoose.Schema(
       ref: "Shop",
       required: true,
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",},
     items: [
       {
         name: String,
@@ -57,6 +61,10 @@ totalAmount: Number,
       type: Number,
       default: 0,
     },
+    location: {
+  lat: { type: Number },
+  lng: { type: Number },
+},
   },
   { timestamps: true }
 );

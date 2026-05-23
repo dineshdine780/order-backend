@@ -7,7 +7,7 @@ const Payment = require("../models/Payment");
 
 router.post("/", async (req, res) => {
   try {
-    const { shopId, items, totalAmount, discount, paymentMethod, creditAmount, paidAmount } = req.body;
+   const { shopId, userId, items, totalAmount, discount, paymentMethod, creditAmount, paidAmount, location } = req.body;
 
     if (!shopId || !items || items.length === 0) {
       return res.status(400).json({ message: "Invalid order data" });
@@ -44,6 +44,7 @@ router.post("/", async (req, res) => {
 const order = new Order({
   orderId,
   shopId,
+  userId,
   items: updatedItems,
   totalAmount: finalTotalAmount,
   discount: Number(discount || 0),
@@ -51,6 +52,7 @@ const order = new Order({
   paidAmount: finalPaidAmount,
   balanceAmount,
   orderStatus: "Pending",
+  location: location || null,
 }); 
 
     await order.save();
@@ -85,6 +87,26 @@ router.get("/order/:id", async (req, res) => {
     res.json(order);
   } catch (err) {
     res.status(500).json({ message: err.message });
+  }
+});
+
+
+router.get("/user/:userId", async (req, res) => {
+
+  try {
+
+    const orders = await Order.find({
+      userId: req.params.userId,
+    });
+
+    res.json(orders);
+
+  } catch (err) {
+
+    res.status(500).json({
+      message: err.message,
+    });
+
   }
 });
 
@@ -662,19 +684,7 @@ router.put(
 
 
 
-router.get("/:shopId", async (req, res) => {
-  try {
-    const orders = await Order.find({
-      shopId: req.params.shopId,
-    })
-      .populate("shopId")
-      .sort({ createdAt: -1 });
 
-    res.json(orders);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
 
 router.get("/", async (req, res) => {
@@ -686,6 +696,21 @@ router.get("/", async (req, res) => {
     res.json(orders);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+
+router.get("/:shopId", async (req, res) => {
+  try {
+    const orders = await Order.find({
+      shopId: req.params.shopId,
+    })
+      .populate("shopId")
+      .sort({ createdAt: -1 });
+
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

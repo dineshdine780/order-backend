@@ -33,13 +33,14 @@ router.post("/", upload.single("photo"), async (req, res) => {
     console.log("BODY:", req.body);
     console.log("FILE:", req.file);
 
-    const { shopName, ownerName, phone, latitude, longitude, locationName  } = req.body;
+    const {userId, shopName, ownerName, phone, latitude, longitude, locationName  } = req.body;
 
     if (!shopName || !ownerName || !phone) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     const newShop = new Shop({
+  userId,
   shopName,
   ownerName,
   phone,
