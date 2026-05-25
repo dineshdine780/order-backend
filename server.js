@@ -13,7 +13,7 @@ const connectDB = require("./config/db");
 const userAuthRoutes = require("./routes/userAuthRoutes");
 const shopRoutes = require("./routes/ShopRoutes");
 const orderRoutes = require("./routes/orderRoutes");
-const adminRoutes = require("./routes/adminRoutes");
+// const adminRoutes = require("./routes/adminRoutes");
 const itemRoutes = require("./routes/itemRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const purchaseRoutes = require("./routes/purchaseRoutes");
@@ -74,7 +74,7 @@ io.on("connection", (socket) => {
 app.use("/api/users", userAuthRoutes);
 app.use("/api/shops", shopRoutes);
 app.use("/api/orders", orderRoutes);
-app.use("/api/admin", adminRoutes);
+// app.use("/api/admin", adminRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/purchases", purchaseRoutes);
