@@ -13,43 +13,43 @@ const loginLimiter = rateLimit({
   message: { message: "Too many login attempts. Try again after 1 minute." }
 }); 
 
-// router.post("/register", async (req, res) => { 
-//   try {
-//     let { name, email, phone, password, role  } = req.body;
+router.post("/register", async (req, res) => { 
+  try {
+    let { name, email, phone, password, role  } = req.body;
    
-//     if (!name || !email || !phone || !password) {
-//       return res.status(400).json({ message: "All fields are required" });
-//     }
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
-//     name = name.trim();
-//     phone = phone.replace(/\s+/g, "");
+    name = name.trim();
+    phone = phone.replace(/\s+/g, "");
    
-//     if (!/^[0-9]{10}$/.test(phone)) {
-//       return res.status(400).json({ message: "Invalid phone number" });
-//     }
+    if (!/^[0-9]{10}$/.test(phone)) {
+      return res.status(400).json({ message: "Invalid phone number" });
+    }
      
-//     const exist = await User.findOne({ phone });
-//     if (exist) {
-//       return res.status(400).json({ message: "User already exists" });
-//     }
+    const exist = await User.findOne({ phone });
+    if (exist) {
+      return res.status(400).json({ message: "User already exists" });
+    }
     
-//     const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
     
-//     await User.create({
-//       name,
-//       email,
-//       phone,
-//       password: hashedPassword,
-//       role: role || "user",
-//     });
+    await User.create({
+      name,
+      email,
+      phone,
+      password: hashedPassword,
+      role: role || "user",
+    });
 
-//     res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({ message: "User registered successfully" });
 
-//   } catch (err) {
-//     console.error("REGISTER ERROR:", err);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });  
+  } catch (err) {
+    console.error("REGISTER ERROR:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});  
  
  
 // router.post("/login", loginLimiter, async (req, res) => {
@@ -108,9 +108,9 @@ router.post("/login", loginLimiter, async (req, res) => {
     );
 
     if (!isMatch) {
-      return res.status(400).json({
+      return res.status(400).json({ 
         message: "Invalid credentials",
-      });
+      }); 
     }
 
     const token = jwt.sign(
@@ -122,8 +122,7 @@ router.post("/login", loginLimiter, async (req, res) => {
       {
         expiresIn: "7d",
       }
-    );
-
+    );  
     res.json({
       token,
 
@@ -154,4 +153,6 @@ router.get("/status-check", protectUser, async (req, res) => {
   }
 });
 
+
 module.exports = router;
+

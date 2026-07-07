@@ -27,7 +27,7 @@ const itemSchema = new mongoose.Schema(
  actualQuantity: {
   type: Number,
   default: 0,
-},
+}, 
 
  image: {
     type: String
